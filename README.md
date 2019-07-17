@@ -1,3 +1,7 @@
+# Where to place the Dataset
+
+Please place the dataset in the folder directly above Seq_AAE_V1.
+
 # Adversarial Learning for Modeling Human Motion
 
 This repository contains the open source code which reproduces the results for the paper: [Adversarial learning for modeling human motion](https://link.springer.com/article/10.1007%2Fs00371-018-1594-7). The authors of this paper are: Qi Wang, Thierry Artières, Mickael Chen, and Ludovic Denoyer.
