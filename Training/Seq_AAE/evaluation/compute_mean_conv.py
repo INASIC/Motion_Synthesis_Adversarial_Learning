@@ -1,1 +1,0 @@
-../../../scripts/compute_mean_conv.py
