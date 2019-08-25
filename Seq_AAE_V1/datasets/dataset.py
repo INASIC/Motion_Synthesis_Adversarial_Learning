@@ -1,10 +1,21 @@
 '''
 In this file, datasets class will be defined.
 '''
-from EmilyaDataset.src.get_dataset import *
+
+import sys
+import os
+root_path = os.getcwd()[:-56]  # Gets the path above the root directory
+print "dataset====="
+print root_path
+sys.path.append(root_path)
+
+from Seq_AAE_V1.datasets.EmilyaDataset.src.get_dataset import *
 # from EmilyaDataset.src.posture_dataset import get_postures_EmilyDataset  # REMOVED
 import math
 from Seq_AAE_V1.synthesis_scripts.synthesis_utils import denormalize,denormalize_vertical_position
+
+from sklearn.preprocessing import MinMaxScaler
+
 
 class Basic_Dataset(object):
     def __init__(self):
@@ -39,8 +50,8 @@ class Emilya_Dataset(Basic_Dataset):
         sequences = denormalize(seqs, max_vector, min_vector)
         new_seq = []
         for seq in sequences:
-            position_coordinates = np.asarray([[1.,90.0,1.]]*seq.shape[0])
-            new_seq.append(np.concatenate((position_coordinates,seq),axis=1))
+            position_coordinates = np.asarray([[1.,90.0,1.]]*seq.shape[0])  # Global coordinates
+            new_seq.append(np.concatenate((position_coordinates,seq),axis=1))  # Concatenate global coordinates to 69 Euler angles
         new_seq = np.asarray(new_seq)
         #sequences = add_xz_positions(xz_position, sequences)
         return new_seq
@@ -117,7 +128,8 @@ class Emilya_Dataset_Velocity_xz(Basic_Dataset):
         self.valid_X = self.hdf_handle['valid_set']['X'][:n]
         self.valid_Y1 = self.hdf_handle['valid_set']['Y1'][:n]
         self.valid_Y2 = self.hdf_handle['valid_set']['Y2'][:n]
-        self.valid_Y3 = self.hdf_handle['valid_set']['Y3'][:200]
+        # self.valid_Y3 = self.hdf_handle['valid_set']['Y3'][:200]
+        self.valid_Y3 = self.hdf_handle['valid_set']['Y3'][:n]
         self.valid_position_xz = self.hdf_handle['valid_set']['velocity_xz_plane'][:n]
 
         self.test_X = self.hdf_handle['test_set']['X'][:n]
@@ -142,6 +154,18 @@ class Emilya_Dataset_Velocity_xz(Basic_Dataset):
 
 
 def generate_positive_samples(nb, mean, covariance, nb_mixture=None, type='Gaussian', seed=None):
+    """
+    Generates random samples which are used to constrain the encodings via the adversarial discriminator.
+
+    Gaussian is the more typical one that is used.
+
+    Note: I have changed this so that the Gaussian generated encodings are min
+    max scaled from 0 to 1, so that this is similar in scale to the encodings
+    of the true samples.
+    """
+
+    # scaler = MinMaxScaler(feature_range=(0,1))
+
     if not seed is None:
         np.random.seed(seed)
     if type == 'Mixture' and (nb_mixture == None or nb_mixture <= 1):
@@ -159,7 +183,10 @@ def generate_positive_samples(nb, mean, covariance, nb_mixture=None, type='Gauss
         latent_var_prior[:, :2] = mixture_gaussian_sampling(nb, nb_mixture, alpha=0.05, beta=1.0, gamma=5.0)
     else:
         raise ValueError('There is no such type of prior %s' % type)
+
+
     return latent_var_prior
+
 
 def mixture_gaussian_sampling(number,num_mixture,alpha=0.05,beta = 1.0,gamma=2.0):
     number_per_mixture = number/(num_mixture)
