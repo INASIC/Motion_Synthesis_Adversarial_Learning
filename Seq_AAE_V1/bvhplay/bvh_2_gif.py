@@ -1,3 +1,8 @@
+"""
+This file was not created by Anthony Hills.
+"""
+
+
 #This file will convert a bvh file to a gif image which has the same number of frames as the bvh file.
 #1. convert frames of bvh to images of posture.
 #2. use the images to create a gif file.
