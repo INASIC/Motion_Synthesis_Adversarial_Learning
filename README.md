@@ -1,3 +1,7 @@
+# Read my Dissertation
+
+My dissertation can be read [here](https://drive.google.com/open?id=1O7T_Trs2W2ceGYk6btAwC6mRZ21pmr01).
+
 # Where to place the Dataset
 
 Please place the dataset in the folder directly above Seq_AAE_V1.
